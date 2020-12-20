@@ -13,17 +13,28 @@ from os import path
 from jsonmerge import merge
 import glob
 
+def removeData():
+    
+    if path.exists('merged_file.json'):
+        os.remove('merged_file.json')
+        
+    pass
+
+
 def loadData():
     
     if path.exists('merged_file.json'):
-        return
+        print('Merged File already exists, run removeData() if the Data is incorrect')
+        with open('merged_file.json') as f:
+            data = json.load(f)
+        return data
     
     read_files = []
     
     count = 0
     filename = '.\\my_spotify_data\\MyData\\StreamingHistory' + str(count) +'.json'
-    print(filename)
-    print(path.exists(filename))
+    print('merging file:',filename)
+    #print(path.exists(filename))
     read_files.append(filename)
     
     while (path.exists(filename)):
@@ -31,8 +42,8 @@ def loadData():
         filename = '.\\my_spotify_data\\MyData\\StreamingHistory' + str(count) +'.json'
         if not path.exists(filename):
             break
-        print(filename)
-        print(path.exists(filename))
+        print('merging file:',filename)
+        #print(path.exists(filename))
         read_files.append(filename)
 
         
@@ -44,6 +55,11 @@ def loadData():
     
     with open("merged_file.json", "w") as outfile:
         json.dump(output_list, outfile)
+        
+    with open('merged_file.json') as f:
+        data = json.load(f)
+        
+    return data
     
     
 def countPlayTime(data):
@@ -51,15 +67,15 @@ def countPlayTime(data):
     #print(data)
     
     total = 0
-    print(len(data))
+    #print(len(data))
     
     for item in data:
         for item2 in item:
             #print(item2)
             total += item2['msPlayed']
-    print('days listened:',total / (60*60*24*1000))
+    #print('days listened:',total / (60*60*24*1000))
     print('hours listened:',total / (60*60*1000))
-    print('minutes listened:',total / (60*1000))
+    #print('minutes listened:',total / (60*1000))
     
     return total / (60*60*1000)
     
@@ -82,30 +98,31 @@ def countArtistListens(data,numberOfTopArtists):
     pass
 
 def countArtistPlayTime(data,artistName):
-    
+    count = 0
     total = 0
     for item in data:
         for item2 in item:
             if artistName == item2['artistName']:
+                count += 1
                 total += item2['msPlayed']
                 
     minutes = total / (60 * 1000)
     hours = total / (60 * 60 * 1000)
     days = total / (60 * 60 * 1000 * 24)
     
-    print('Total listen time for',artistName,'is',days,'days.')
-    print('Total listen time for',artistName,'is',hours,'hours.')
-    print('Total listen time for',artistName,'is',minutes,'mintues.')
+    #print('Total listen time for',artistName,'is',days,'days over',count,'songs.')
+    print('Total listen time for',artistName,'is',hours,'hours over',count,'songs.')
+    #print('Total listen time for',artistName,'is',minutes,'mintues over',count,'songs.')
     pass
 
 def Main():
-    loadData()
-    file = 'merged_file.json'
-    with open(file) as f:
-        data = json.load(f)
+    data = loadData()
+
     countPlayTime(data)
     countArtistListens(data,10)
     countArtistPlayTime(data,'Young the Giant')
+    
+    #removeData()
     
     
     pass
