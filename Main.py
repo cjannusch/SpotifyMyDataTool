@@ -7,11 +7,10 @@ Created on Sat Dec 19 09:30:51 2020
 
 import matplotlib.pyplot as plt
 import json
-from io import StringIO
 import os.path
 from os import path
-from jsonmerge import merge
-import glob
+from datetime import datetime
+from dateutil import tz
 
 def removeData():
     
@@ -115,12 +114,53 @@ def countArtistPlayTime(data,artistName):
     #print('Total listen time for',artistName,'is',minutes,'mintues over',count,'songs.')
     pass
 
+def countTimeOfDayListening(data):
+    
+    listOfCounts = {'00':0,'01':0,'02':0,'03':0,'04':0,'05':0,'06':0,'07':0,'08':0,'09':0,'10'
+                    :0,'11':0,'12':0,'13':0,'14':0,'15':0,'16':0,'17':0,'18':0,'19':0,'20':0,
+                    '21':0,'22':0,'23':0}
+    
+    for item in data:
+        for item2 in item:
+            #print(item2['endTime'])
+            to_zone = tz.tzlocal()
+            utc = datetime.strptime(item2['endTime'], '%Y-%m-%d %H:%M')
+            converted = utc.astimezone(to_zone)
+            converted = str(converted)[0:-9] #converts to same format as before! woop woop
+            #central = datetime.strptime(str(central), '%Y-%m-%d %H:%M')
+            #print(converted)
+            #print(item2['endTime'][-5:-3])
+            hour = str((int(converted[-5:-3]) - 6) % 24)
+            if len(hour) == 1:
+                hour = '0' + hour
+            listOfCounts[hour] += 1
+            
+            
+            pass
+    
+    sizes = []
+    sumOfCounts = 0
+    
+    for point in listOfCounts:
+        sumOfCounts += listOfCounts[point]
+        
+    for point in listOfCounts:
+        sizes.append(listOfCounts[point])
+    
+    print(sizes)
+    
+    plt.bar(list(listOfCounts.keys()), listOfCounts.values(), color='g')
+    plt.show()
+
+
 def Main():
     data = loadData()
 
-    countPlayTime(data)
-    countArtistListens(data,10)
-    countArtistPlayTime(data,'Young the Giant')
+    #countPlayTime(data)
+    #countArtistListens(data,10)
+    #countArtistPlayTime(data,'Young the Giant')
+    
+    countTimeOfDayListening(data)
     
     #removeData()
     
