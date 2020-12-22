@@ -1,0 +1,20 @@
+[
+  {
+    "voiceSearchQuery" : "play 21c Delta by Jack Harlow on Spotify",
+    "catalogue" : "premium",
+    "country" : "US",
+    "locale" : "en",
+    "languageRequested" : "en-US,en;q=0.9",
+    "entityType" : "TRACK",
+    "time" : "2020-12-18T00:17:32.622Z"
+  },
+  {
+    "voiceSearchQuery" : "Play Tyler Hero by Jack Harlow",
+    "catalogue" : "premium",
+    "country" : "US",
+    "locale" : "en",
+    "languageRequested" : "en-US,en;q=0.9",
+    "entityType" : "TRACK",
+    "time" : "2020-12-18T00:21:22.473Z"
+  }
+]

@@ -10,6 +10,7 @@ import json
 import os.path
 from os import path
 from datetime import datetime
+from datetime import date
 from dateutil import tz
 
 def removeData():
@@ -20,10 +21,13 @@ def removeData():
     pass
 
 
-def loadData():
+def loadData(newMergeFile = False):
+    
+    if newMergeFile:
+        removeData()
     
     if path.exists('merged_file.json'):
-        print('Merged File already exists, run removeData() if the Data is incorrect')
+        #print('Merged File already exists, run removeData() if the Data is incorrect')
         with open('merged_file.json') as f:
             data = json.load(f)
         return data
@@ -90,6 +94,8 @@ def countArtistListens(data,numberOfTopArtists):
                 artistCountDict[str(item2['artistName'])] = 1
     #print(artistCountDict)     
     for i in range(numberOfTopArtists):
+        if len(artistCountDict.keys()) == 0:
+            continue
         maximum = max(artistCountDict, key=artistCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(maximum, artistCountDict[maximum])
         artistCountDict.pop(maximum)
@@ -136,9 +142,6 @@ def countTimeOfDayListening(data):
             if len(hour) == 1:
                 hour = '0' + hour
             listOfCounts[hour] += 1
-            
-            
-            pass
     
     sizes = []
     sumOfCounts = 0
@@ -149,9 +152,15 @@ def countTimeOfDayListening(data):
     for point in listOfCounts:
         sizes.append(listOfCounts[point])
     
-    print(sizes)
+    #print(sizes)
+    
+    dateStart,dateEnd = getTimePeriodOfData(data)
     
     plt.bar(list(listOfCounts.keys()), listOfCounts.values(), color='g')
+    plt.title(getUser()+'\'s listening habits \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
+    plt.xlabel('Hour of The Day')
+    plt.ylabel('# of songs listened to')
+    plt.style.use('ggplot')
     plt.show()
 
 
@@ -163,37 +172,102 @@ def subsetDataByDate(data,startDate,endDate):
     
     startYear = startDate[0:4]
     startMonth = startDate[5:7]
+    startDay = startDate[8:10]
     endYear = endDate[0:4]
     endMonth = endDate[5:7]
-    #print(startYear, startMonth)
-    
+    endDay = endDate[8:10]
+    start = date(int(startYear), int(startMonth),int(startDay))
+    end = date(int(endYear), int(endMonth),int(endDay))
+
     for item in data:
         for item2 in item:
-            #print(item2)
+            itemDay = item2['endTime'][8:10]
             itemMonth = item2['endTime'][5:7]
             itemYear = item2['endTime'][0:4]
-            if (int(endYear) - int(itemYear)) >= 0 and (int(startYear) - int(itemYear)) <= 0:
-                if (int(endMonth) - int(itemMonth)) >= 0 and (int(startMonth) - int(itemMonth)) <= 0:
-                    newData.append(item2)
-            pass
-
-    #print(len(data[2]))
-    #print(len(newData))
+            time = date(int(itemYear), int(itemMonth),int(itemDay))
+            if start <= time <= end:
+                newData.append(item2)
+            
     return [newData]
     pass
 
+def getUser():
+    
+    filename = '.\\my_spotify_data\\MyData\\Userdata.json'
+    
+    if not path.exists(filename): 
+        return 'NO NAME LOL'
+    
+    with open(filename) as f:
+        user = json.load(f)
+        user = user['username']
+        return user
+    
+    pass
+
+
+def getTimePeriodOfData(data):
+    
+    startDate = None
+    
+    for item in data:
+        for item2 in item:
+            itemDay = item2['endTime'][8:10]
+            itemMonth = item2['endTime'][5:7]
+            itemYear = item2['endTime'][0:4]
+            time = date(int(itemYear), int(itemMonth),int(itemDay))
+            if startDate == None:
+                startDate = time
+            
+    endDate = time
+    
+    return (startDate,endDate)
+
+def runMethodOnYear(data,year):
+    
+    for i in range(12):
+        #data = loadData()
+        if i == 0:
+            continue
+        start,end = year+'-',year+'-'
+        if len(str(i)) == 1:
+            temp1 = '0'+str(i)
+        else:
+            temp1 = str(i)
+        if len(str(i + 1)) == 1:
+            temp2 = '0'+str(i + 1)
+        else:
+            temp2 = str(i + 1)
+        start = start + temp1 + '-01'
+        end = end + temp2 + '-01'
+        
+        print(start,'-->',end)
+        
+        subsetData = subsetDataByDate(data,start,end)
+        countArtistListens(subsetData,3)
+        #countTimeOfDayListening(subsetData)
+    
+    
+    pass
+
 def Main():
+    #data = loadData(True)
     data = loadData()
 
     #countPlayTime(data)
     #countArtistListens(data,10)
     #countArtistPlayTime(data,'Young the Giant')
     
+    countTimeOfDayListening(data)
+    
+    #data = subsetDataByDate(data,'2020-07-01','2020-08-01')
+    
+    runMethodOnYear(data,'2020')
+
+    
+    #countArtistListens(data,10)
     #countTimeOfDayListening(data)
     
-    data = subsetDataByDate(data,'2020-00','2020-12')
-    
-    countArtistListens(data,10)
     
     #removeData()
     
