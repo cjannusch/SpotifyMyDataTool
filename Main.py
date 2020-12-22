@@ -126,11 +126,13 @@ def countTimeOfDayListening(data):
             to_zone = tz.tzlocal()
             utc = datetime.strptime(item2['endTime'], '%Y-%m-%d %H:%M')
             converted = utc.astimezone(to_zone)
+            toSubtract = int(str(converted)[-6:-3])
+            #print(toSubtract)
             converted = str(converted)[0:-9] #converts to same format as before! woop woop
             #central = datetime.strptime(str(central), '%Y-%m-%d %H:%M')
             #print(converted)
-            #print(item2['endTime'][-5:-3])
-            hour = str((int(converted[-5:-3]) - 6) % 24)
+            #print(item2['endTime'][-5:-3]) previous way of doing it only works for CST
+            hour = str((int(converted[-5:-3]) + toSubtract) % 24)
             if len(hour) == 1:
                 hour = '0' + hour
             listOfCounts[hour] += 1
