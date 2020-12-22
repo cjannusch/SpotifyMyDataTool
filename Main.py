@@ -155,6 +155,33 @@ def countTimeOfDayListening(data):
     plt.show()
 
 
+def subsetDataByDate(data,startDate,endDate):
+    
+    # format of dates is '2020-12-16 TI:ME'
+    #print(type(data))
+    newData = []
+    
+    startYear = startDate[0:4]
+    startMonth = startDate[5:7]
+    endYear = endDate[0:4]
+    endMonth = endDate[5:7]
+    #print(startYear, startMonth)
+    
+    for item in data:
+        for item2 in item:
+            #print(item2)
+            itemMonth = item2['endTime'][5:7]
+            itemYear = item2['endTime'][0:4]
+            if (int(endYear) - int(itemYear)) >= 0 and (int(startYear) - int(itemYear)) <= 0:
+                if (int(endMonth) - int(itemMonth)) >= 0 and (int(startMonth) - int(itemMonth)) <= 0:
+                    newData.append(item2)
+            pass
+
+    #print(len(data[2]))
+    #print(len(newData))
+    return [newData]
+    pass
+
 def Main():
     data = loadData()
 
@@ -162,7 +189,11 @@ def Main():
     #countArtistListens(data,10)
     #countArtistPlayTime(data,'Young the Giant')
     
-    countTimeOfDayListening(data)
+    #countTimeOfDayListening(data)
+    
+    data = subsetDataByDate(data,'2020-00','2020-12')
+    
+    countArtistListens(data,10)
     
     #removeData()
     
