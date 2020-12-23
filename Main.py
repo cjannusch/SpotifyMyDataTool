@@ -244,8 +244,16 @@ def runMethodOnYear(data,year):
         print(start,'-->',end)
         
         subsetData = subsetDataByDate(data,start,end)
-        countArtistListens(subsetData,3)
+        countPlayTime(subsetData)
+        #countArtistListens(subsetData,3)
         #countTimeOfDayListening(subsetData)
+        
+    #extra for december 
+    start,end = year+'-12-01',year+'-12-31'
+    subsetData = subsetDataByDate(data,start,end)
+    print(start,'-->',end)
+    countPlayTime(subsetData)
+    #countArtistListens(subsetData,3)
     
     
     pass
