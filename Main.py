@@ -23,6 +23,8 @@ def removeData():
 
 def loadData(newMergeFile = False):
     
+    # TODO Add Automatic check to see if merge file is correct
+    
     if newMergeFile:
         removeData()
     
@@ -97,7 +99,7 @@ def countArtistListens(data,numberOfTopArtists):
         if len(artistCountDict.keys()) == 0:
             continue
         maximum = max(artistCountDict, key=artistCountDict.get)  # Just use 'min' instead of 'max' for minimum.
-        print(maximum, artistCountDict[maximum])
+        print(str(i + 1)+':',maximum, artistCountDict[maximum])
         artistCountDict.pop(maximum)
     
     pass
@@ -244,19 +246,30 @@ def runMethodOnYear(data,year):
         print(start,'-->',end)
         
         subsetData = subsetDataByDate(data,start,end)
-        countPlayTime(subsetData)
+        #countPlayTime(subsetData)
         #countArtistListens(subsetData,3)
-        #countTimeOfDayListening(subsetData)
+        countTimeOfDayListening(subsetData)
         
     #extra for december 
     start,end = year+'-12-01',year+'-12-31'
     subsetData = subsetDataByDate(data,start,end)
     print(start,'-->',end)
-    countPlayTime(subsetData)
+    #countPlayTime(subsetData)
+    countTimeOfDayListening(subsetData)
     #countArtistListens(subsetData,3)
     
     
     pass
+
+
+
+# TODO Write method to count most played songs
+
+# TODO Write method to find new artists over monthly period
+
+# TODO Write method to find biggest Consecutive listens
+
+# TODO Make use of graphs more, everyone likes graphs
 
 def Main():
     #data = loadData(True)
@@ -264,16 +277,16 @@ def Main():
 
     #countPlayTime(data)
     #countArtistListens(data,10)
-    #countArtistPlayTime(data,'Young the Giant')
+    #countArtistPlayTime(data,'Tame Impala')
     
-    countTimeOfDayListening(data)
+    #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-07-01','2020-08-01')
+    #data = subsetDataByDate(data,'2020-09-01','2020-12-14')
     
-    runMethodOnYear(data,'2020')
+    #runMethodOnYear(data,'2020')
 
     
-    #countArtistListens(data,10)
+    countArtistListens(data,10)
     #countTimeOfDayListening(data)
     
     
