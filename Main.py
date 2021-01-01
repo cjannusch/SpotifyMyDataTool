@@ -101,7 +101,7 @@ def countArtistListens(data,numberOfTopArtists):
         if len(artistCountDict.keys()) == 0:
             continue
         maximum = max(artistCountDict, key=artistCountDict.get)  # Just use 'min' instead of 'max' for minimum.
-        print(str(i + 1)+':',maximum, artistCountDict[maximum])
+        print(str(i + 1)+':',maximum, '-', artistCountDict[maximum])
         artistCountDict.pop(maximum)
     
     pass
@@ -252,9 +252,23 @@ def runMethodOnYear(data,year):
     #countArtistListens(subsetData,3)
     
 
-
-
-# TODO Write method to count most played songs
+def countTopSongs(data,numberOfTopSongs):
+    
+    trackNameCountDict = {}
+    
+    for item in data:
+        for item2 in item:
+            if '"'+str(item2['trackName'])+'" by: '+item2['artistName']  in trackNameCountDict:
+                trackNameCountDict['"'+str(item2['trackName'])+'" by: '+item2['artistName']] += 1
+            else:
+                trackNameCountDict['"'+str(item2['trackName'])+'" by: '+item2['artistName']] = 1   
+    for i in range(numberOfTopSongs):
+        if len(trackNameCountDict.keys()) == 0:
+            continue
+        maximum = max(trackNameCountDict, key=trackNameCountDict.get)  # Just use 'min' instead of 'max' for minimum.
+        print(str(i + 1)+':',maximum,'-', trackNameCountDict[maximum])
+        trackNameCountDict.pop(maximum)
+    
 
 # TODO Write method to find new artists over monthly period
 
@@ -276,6 +290,7 @@ def Main():
     #runMethodOnYear(data,'2020')
 
     
+    countTopSongs(data,10)
     countArtistListens(data,10)
     #countTimeOfDayListening(data)
     
