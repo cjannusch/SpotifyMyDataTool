@@ -23,13 +23,22 @@ def removeData():
 
 def loadData(newMergeFile = False):
     
-    # TODO Add Automatic check to see if merge file is correct
-    
     if newMergeFile:
         removeData()
+        
+    # Performs automatic check to see if the merge file matches the MyData History
+    # This is useful if you are running methods on multiple data sets in one session
     
     if path.exists('merged_file.json'):
-        #print('Merged File already exists, run removeData() if the Data is incorrect')
+        with open('merged_file.json', encoding="utf8") as f:
+            inMerge = json.load(f)[0][0]
+            with open('.\\my_spotify_data\\MyData\\StreamingHistory0.json', encoding="utf8") as g:
+                inFirst = json.load(g)[0]
+        if not inFirst == inMerge:
+            print('data does not match')
+            removeData()
+    
+    if path.exists('merged_file.json'):
         with open('merged_file.json') as f:
             data = json.load(f)
         return data
@@ -39,7 +48,6 @@ def loadData(newMergeFile = False):
     count = 0
     filename = '.\\my_spotify_data\\MyData\\StreamingHistory' + str(count) +'.json'
     print('merging file:',filename)
-    #print(path.exists(filename))
     read_files.append(filename)
     
     while (path.exists(filename)):
@@ -48,7 +56,6 @@ def loadData(newMergeFile = False):
         if not path.exists(filename):
             break
         print('merging file:',filename)
-        #print(path.exists(filename))
         read_files.append(filename)
 
         
@@ -69,14 +76,10 @@ def loadData(newMergeFile = False):
     
 def countPlayTime(data):
     
-    #print(data)
-    
     total = 0
-    #print(len(data))
     
     for item in data:
         for item2 in item:
-            #print(item2)
             total += item2['msPlayed']
     #print('days listened:',total / (60*60*24*1000))
     print('hours listened:',total / (60*60*1000))
@@ -93,8 +96,7 @@ def countArtistListens(data,numberOfTopArtists):
             if str(item2['artistName']) in artistCountDict:
                 artistCountDict[str(item2['artistName'])] += 1
             else:
-                artistCountDict[str(item2['artistName'])] = 1
-    #print(artistCountDict)     
+                artistCountDict[str(item2['artistName'])] = 1   
     for i in range(numberOfTopArtists):
         if len(artistCountDict.keys()) == 0:
             continue
@@ -130,16 +132,11 @@ def countTimeOfDayListening(data):
     
     for item in data:
         for item2 in item:
-            #print(item2['endTime'])
             to_zone = tz.tzlocal()
             utc = datetime.strptime(item2['endTime'], '%Y-%m-%d %H:%M')
             converted = utc.astimezone(to_zone)
             toSubtract = int(str(converted)[-6:-3])
-            #print(toSubtract)
             converted = str(converted)[0:-9] #converts to same format as before! woop woop
-            #central = datetime.strptime(str(central), '%Y-%m-%d %H:%M')
-            #print(converted)
-            #print(item2['endTime'][-5:-3]) previous way of doing it only works for CST
             hour = str((int(converted[-5:-3]) + toSubtract) % 24)
             if len(hour) == 1:
                 hour = '0' + hour
@@ -154,8 +151,6 @@ def countTimeOfDayListening(data):
     for point in listOfCounts:
         sizes.append(listOfCounts[point])
     
-    #print(sizes)
-    
     dateStart,dateEnd = getTimePeriodOfData(data)
     
     plt.bar(list(listOfCounts.keys()), listOfCounts.values(), color='g')
@@ -169,7 +164,6 @@ def countTimeOfDayListening(data):
 def subsetDataByDate(data,startDate,endDate):
     
     # format of dates is '2020-12-16 TI:ME'
-    #print(type(data))
     newData = []
     
     startYear = startDate[0:4]
@@ -191,7 +185,6 @@ def subsetDataByDate(data,startDate,endDate):
                 newData.append(item2)
             
     return [newData]
-    pass
 
 def getUser():
     
@@ -204,8 +197,6 @@ def getUser():
         user = json.load(f)
         user = user['username']
         return user
-    
-    pass
 
 
 def getTimePeriodOfData(data):
@@ -225,6 +216,8 @@ def getTimePeriodOfData(data):
     
     return (startDate,endDate)
 
+
+# TODO Make this method smarter? or break into different methods i suppose
 def runMethodOnYear(data,year):
     
     for i in range(12):
@@ -258,8 +251,6 @@ def runMethodOnYear(data,year):
     countTimeOfDayListening(subsetData)
     #countArtistListens(subsetData,3)
     
-    
-    pass
 
 
 
@@ -272,7 +263,6 @@ def runMethodOnYear(data,year):
 # TODO Make use of graphs more, everyone likes graphs
 
 def Main():
-    #data = loadData(True)
     data = loadData()
 
     #countPlayTime(data)
@@ -281,7 +271,7 @@ def Main():
     
     #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-09-01','2020-12-14')
+    #data = subsetDataByDate(data,'2020-05-01','2020-09-01')
     
     #runMethodOnYear(data,'2020')
 
