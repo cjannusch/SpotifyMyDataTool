@@ -12,6 +12,7 @@ from os import path
 from datetime import datetime
 from datetime import date
 from dateutil import tz
+from datetime import timedelta
 
 def removeData():
     
@@ -268,6 +269,55 @@ def countTopSongs(data,numberOfTopSongs):
         maximum = max(trackNameCountDict, key=trackNameCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(str(i + 1)+':',maximum,'-', trackNameCountDict[maximum])
         trackNameCountDict.pop(maximum)
+        
+        
+def countMostConsecutiveListens(data):
+    
+    isNewListeningSession = True
+    listOfListeningSessions = []
+    initialItem = None
+    
+    count = 0
+    
+    for item in data:
+        for item2 in item:
+            if isNewListeningSession:
+                initialItem = item2
+                isNewListeningSession = False
+                if count > 10:
+                    print(count)
+                count = 0
+                continue
+            
+            isChain = convertStringToDatetimeHelper(item2['endTime']) - convertStringToDatetimeHelper(initialItem['endTime']) < timedelta(milliseconds = int(item2['msPlayed'])+ 60000 ) 
+            
+            
+            
+            if isChain:
+                #print(isChain)
+                #print('new same session')
+                count += 1
+            else:
+                isNewListeningSession = True
+                
+    
+    print(count)
+    
+    pass
+
+def convertStringToDatetimeHelper(stringDate):
+    
+    Year = stringDate[0:4]
+    Month = stringDate[5:7]
+    Day = stringDate[8:10]
+    Hour = stringDate[11:13]
+    Second = stringDate[14:16]
+    
+    return datetime(int(Year),int(Month),int(Day),int(Hour),int(Second))
+    
+    
+    
+    pass
     
 
 # TODO Write method to find new artists over monthly period
@@ -285,18 +335,24 @@ def Main():
     
     #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-05-01','2020-09-01')
+    #data = subsetDataByDate(data,'2020-05-01','2020-06-01')
     
     #runMethodOnYear(data,'2020')
 
     
-    countTopSongs(data,10)
-    countArtistListens(data,10)
+    #countTopSongs(data,10)
+    #countArtistListens(data,10)
     #countTimeOfDayListening(data)
     
     
     #removeData()
+
+    #countMostConsecutiveListens(data)
+
     
+    isChain = convertStringToDatetimeHelper("2019-12-24 15:49") - convertStringToDatetimeHelper("2019-12-24 15:50") < timedelta(milliseconds = 48734 + 60000)
+    # milliseconds = msPlayed
+    print(isChain)
     
     pass
 
