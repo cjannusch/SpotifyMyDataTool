@@ -88,9 +88,10 @@ def countPlayTime(data):
     
     return total / (60*60*1000)
     
-def countArtistListens(data,numberOfTopArtists):
+def countArtistListens(data,numberOfTopArtists,toGraph = False):
     
     artistCountDict = {}
+    toGraph = {}
     
     for item in data:
         for item2 in item:
@@ -103,9 +104,28 @@ def countArtistListens(data,numberOfTopArtists):
             continue
         maximum = max(artistCountDict, key=artistCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(str(i + 1)+':',maximum, '-', artistCountDict[maximum])
+        toGraph[maximum] = artistCountDict[maximum]
         artistCountDict.pop(maximum)
+        
+    # Start of graphing stuff 
     
-    pass
+    if toGraph:
+        
+        dateStart,dateEnd = getTimePeriodOfData(data)
+            
+        font = {'family' : 'normal',
+            'weight' : 'normal',
+            'size'   : 10}
+        plt.rc('font', **font)
+        
+        plt.bar(list(toGraph.keys()), toGraph.values(), color='r', width=0.8)
+        #plt.legend(loc="upper left")
+        plt.title(getUser()+'\'s favorite Artists \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
+        plt.ylabel('# of songs listened to')
+        plt.style.use('ggplot')
+        plt.xticks(rotation=45, ha='right')
+        plt.autoscale()
+        plt.show()
 
 def countArtistPlayTime(data,artistName):
     count = 0
@@ -253,9 +273,10 @@ def runMethodOnYear(data,year):
     #countArtistListens(subsetData,3)
     
 
-def countTopSongs(data,numberOfTopSongs):
+def countSongListens(data,numberOfTopSongs,toGraph = False):
     
     trackNameCountDict = {}
+    toGraph = {}
     
     for item in data:
         for item2 in item:
@@ -268,14 +289,40 @@ def countTopSongs(data,numberOfTopSongs):
             continue
         maximum = max(trackNameCountDict, key=trackNameCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(str(i + 1)+':',maximum,'-', trackNameCountDict[maximum])
+        toGraph[maximum] = trackNameCountDict[maximum]
         trackNameCountDict.pop(maximum)
         
+    #Start of graph shiznit    
+    
+    if toGraph:
         
+        dateStart,dateEnd = getTimePeriodOfData(data)
+            
+        font = {'family' : 'normal',
+            'weight' : 'normal',
+            'size'   : 10}
+        plt.rc('font', **font)
+        
+        plt.bar(list(toGraph.keys()), toGraph.values(), color='r',align='edge', width=.8)
+        #plt.legend(loc="upper left")
+        plt.title(getUser()+'\'s favorite songs \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
+        plt.ylabel('# of songs listened to')
+        plt.style.use('ggplot')
+        plt.xticks(rotation=45, ha='right')
+        plt.autoscale()
+        plt.show()
+    
+        
+    
+# TODO redo logic on this method
 def countMostConsecutiveListens(data):
     
     isNewListeningSession = True
-    listOfListeningSessions = []
+    listOfListeningSessions = {}
     initialItem = None
+    initialDate = None
+    nextItem = None
+    nextDate = None
     
     count = 0
     
@@ -331,17 +378,17 @@ def Main():
 
     #countPlayTime(data)
     #countArtistListens(data,10)
-    #countArtistPlayTime(data,'Tame Impala')
+    countArtistPlayTime(data,'Big Gigantic')
     
     #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-05-01','2020-06-01')
+    #data = subsetDataByDate(data,'2020-05-01','2020-09-01')
     
     #runMethodOnYear(data,'2020')
 
     
-    #countTopSongs(data,10)
-    #countArtistListens(data,10)
+    #countArtistListens(data,10,True)
+    #countSongListens(data,10,True)
     #countTimeOfDayListening(data)
     
     
@@ -350,9 +397,9 @@ def Main():
     #countMostConsecutiveListens(data)
 
     
-    isChain = convertStringToDatetimeHelper("2019-12-24 15:49") - convertStringToDatetimeHelper("2019-12-24 15:50") < timedelta(milliseconds = 48734 + 60000)
+    #isChain = convertStringToDatetimeHelper("2019-12-24 15:49") - convertStringToDatetimeHelper("2019-12-24 15:50") < timedelta(milliseconds = 48734 + 60000)
     # milliseconds = msPlayed
-    print(isChain)
+    #print(isChain)
     
     pass
 

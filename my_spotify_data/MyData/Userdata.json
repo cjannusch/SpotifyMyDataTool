@@ -1,14 +1,14 @@
 {
-  "username": "claytonjannusch",
-  "email": "claytonjannusch@gmail.com",
+  "username": "abbeybeem",
+  "email": "abbeybeem@gmail.com",
   "country": "US",
   "createdFromFacebook": false,
-  "facebookUid": null,
-  "birthdate": "1999-05-04",
-  "gender": "male",
-  "postalCode": "53593",
-  "mobileNumber": null,
-  "mobileOperator": null,
-  "mobileBrand": null,
-  "creationTime": "2017-08-10"
+  "facebookUid": "545538218898987",
+  "birthdate": "1999-11-30",
+  "gender": "female",
+  "postalCode": "53597",
+  "mobileNumber": "3192395838",
+  "mobileOperator": "Verizon Wireless",
+  "mobileBrand": "Apple iPhone",
+  "creationTime": "2014-12-03"
 }
