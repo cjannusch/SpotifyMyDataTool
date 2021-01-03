@@ -269,8 +269,8 @@ def runMethodOnYear(data,year):
     subsetData = subsetDataByDate(data,start,end)
     print(start,'-->',end)
     #countPlayTime(subsetData)
-    countTimeOfDayListening(subsetData)
-    #countArtistListens(subsetData,3)
+    #countTimeOfDayListening(subsetData)
+    countArtistListens(subsetData,3)
     
 
 def countSongListens(data,numberOfTopSongs,toGraph = False):
