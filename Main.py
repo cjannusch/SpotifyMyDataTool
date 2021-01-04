@@ -323,32 +323,40 @@ def countMostConsecutiveListens(data):
     initialDate = None
     nextItem = None
     nextDate = None
+    listOfShit = []
     
     count = 0
+    length = 0
     
     for item in data:
-        for item2 in item:
+        for i in range(len(item)-1):
             if isNewListeningSession:
-                initialItem = item2
-                isNewListeningSession = False
-                if count > 10:
-                    print(count)
+                if count > 20:
+                    length = length / (60000 * 60)
+                    print(initialDate,'to',nextDate,'number of songs',count,'length of listen session',length)
+                listOfShit.append((initialDate,'to',nextDate,count))
+                initialDate = item[i]['endTime']
+                nextDate = item[i+1]['endTime']
                 count = 0
-                continue
+                length = 0
+                isNewListeningSession = False
+            initialItem = item[i]
+            nextItem = item[i+1]
             
-            isChain = convertStringToDatetimeHelper(item2['endTime']) - convertStringToDatetimeHelper(initialItem['endTime']) < timedelta(milliseconds = int(item2['msPlayed'])+ 60000 ) 
+            isChain = convertStringToDatetimeHelper(nextItem['endTime']) - \
+            convertStringToDatetimeHelper(initialItem['endTime']) <= timedelta(milliseconds =\
+            initialItem['msPlayed'] + 90000)
             
-            
-            
-            if isChain:
-                #print(isChain)
-                #print('new same session')
-                count += 1
-            else:
+            if not isChain:
                 isNewListeningSession = True
                 
-    
-    print(count)
+            else:
+                count += 1
+                length += initialItem['msPlayed']
+                isNewListeningSession = False
+                
+                
+                pass
     
     pass
 
@@ -378,11 +386,11 @@ def Main():
 
     #countPlayTime(data)
     #countArtistListens(data,10)
-    countArtistPlayTime(data,'Big Gigantic')
+    #countArtistPlayTime(data,'Big Gigantic')
     
     #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-05-01','2020-09-01')
+    data = subsetDataByDate(data,'2020-03-01','2020-05-01')
     
     #runMethodOnYear(data,'2020')
 
@@ -394,12 +402,12 @@ def Main():
     
     #removeData()
 
-    #countMostConsecutiveListens(data)
+    countMostConsecutiveListens(data)
 
     
-    #isChain = convertStringToDatetimeHelper("2019-12-24 15:49") - convertStringToDatetimeHelper("2019-12-24 15:50") < timedelta(milliseconds = 48734 + 60000)
+    test1 = convertStringToDatetimeHelper("2019-12-24 15:49")
     # milliseconds = msPlayed
-    #print(isChain)
+    print(test1)
     
     pass
 
