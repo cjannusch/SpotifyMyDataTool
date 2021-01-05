@@ -13,6 +13,9 @@ from datetime import datetime
 from datetime import date
 from dateutil import tz
 from datetime import timedelta
+from matplotlib.dates import (YEARLY, DateFormatter,
+                              rrulewrapper, RRuleLocator, drange)
+import matplotlib.dates as mdates
 
 def removeData():
     
@@ -315,7 +318,7 @@ def countSongListens(data,numberOfTopSongs,toGraph = False):
         
     
 # TODO redo logic on this method
-def countMostConsecutiveListens(data):
+def countMostConsecutiveListens(data,minimumListenTime = 2):
     
     isNewListeningSession = True
     listOfListeningSessions = {}
@@ -331,10 +334,9 @@ def countMostConsecutiveListens(data):
     for item in data:
         for i in range(len(item)-1):
             if isNewListeningSession:
-                if count > 20:
-                    length = length / (60000 * 60)
-                    print(initialDate,'to',nextDate,'number of songs',count,'length of listen session',length)
-                listOfShit.append((initialDate,'to',nextDate,count))
+                if length > minimumListenTime:
+                    #print(initialDate,'to',nextDate,'number of songs',count,'length of listen session',length, 'hours.')
+                    listOfShit.append(((str(initialDate)+' to '+str(nextDate)),length))
                 initialDate = item[i]['endTime']
                 nextDate = item[i+1]['endTime']
                 count = 0
@@ -342,6 +344,7 @@ def countMostConsecutiveListens(data):
                 isNewListeningSession = False
             initialItem = item[i]
             nextItem = item[i+1]
+            nextDate = item[i+1]['endTime']
             
             isChain = convertStringToDatetimeHelper(nextItem['endTime']) - \
             convertStringToDatetimeHelper(initialItem['endTime']) <= timedelta(milliseconds =\
@@ -352,13 +355,26 @@ def countMostConsecutiveListens(data):
                 
             else:
                 count += 1
-                length += initialItem['msPlayed']
+                length += initialItem['msPlayed'] / (60000 * 60)
                 isNewListeningSession = False
                 
-                
-                pass
+    fig, ax = plt.subplots()
     
-    pass
+    for date in listOfShit:
+        plt.scatter(date[0][:10], date[1])
+                
+
+    plt.xticks(rotation=60, ha='right')
+    startDate,endDate = getTimePeriodOfData(data)
+    plt.title(getUser()+'\'s listening sessions greater than \n ' + str(minimumListenTime) + ' hours')
+    #plt.xticks([])
+    plt.ylabel('length of listening (hours)')
+    plt.xlabel('from ' + str(startDate) + ' --> ' + str(endDate))
+    
+    if len(listOfShit) > 20:
+        plt.xticks([])
+    
+    plt.show() 
 
 def convertStringToDatetimeHelper(stringDate):
     
@@ -390,7 +406,7 @@ def Main():
     
     #countTimeOfDayListening(data)
     
-    data = subsetDataByDate(data,'2020-03-01','2020-05-01')
+    #data = subsetDataByDate(data,'2020-03-01','2020-05-01')
     
     #runMethodOnYear(data,'2020')
 
@@ -402,12 +418,12 @@ def Main():
     
     #removeData()
 
-    countMostConsecutiveListens(data)
+    countMostConsecutiveListens(data,1.5)
 
     
-    test1 = convertStringToDatetimeHelper("2019-12-24 15:49")
+    #test1 = convertStringToDatetimeHelper("2019-12-24 15:49")
     # milliseconds = msPlayed
-    print(test1)
+    #print(test1)
     
     pass
 
