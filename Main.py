@@ -13,9 +13,56 @@ from datetime import datetime
 from datetime import date
 from dateutil import tz
 from datetime import timedelta
-from matplotlib.dates import (YEARLY, DateFormatter,
-                              rrulewrapper, RRuleLocator, drange)
-import matplotlib.dates as mdates
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from SpotifyApiKeys import getKeys
+
+
+def lookAtUsersPublicPlayLists():
+    
+    #q=track:TRACKNAME%20artist:ARTISTNAME&type=track
+    #q=artist:ARTISTNAME&type=artist
+    
+    
+    newFile = open('ListOfNames.txt','w+',encoding = 'utf-8')
+    
+    
+    CLIENT_ID,CLIENT_SECRET=getKeys()
+    
+    auth_manager = SpotifyClientCredentials(CLIENT_ID,CLIENT_SECRET)
+    sp = spotipy.Spotify(auth_manager=auth_manager)
+    
+    SpotifyUserToSearchFor = str(getUser())
+    #AlbumID= '0QIzRT7DLG6Eg74WfSUSvW'
+    
+    count = 0
+    
+    playlists = sp.user_playlists(SpotifyUserToSearchFor)
+    while playlists:
+        for i, playlist in enumerate(playlists['items']):
+            newFile.write("Playlist = " + str(playlist['name']) + "\n")
+            #print("Playlist =",playlist['name'])
+            
+            result = sp.user_playlist_tracks(SpotifyUserToSearchFor,playlist['id'])
+            
+            #print(result)
+    
+            for song in result['items']:
+                if song == None:
+                    #print("total songs",count)
+                    newFile.write("total songs" + str(count) + "\n")
+                    newFile.close()
+                count +=1
+                #print('\t',song['track']['name'])
+                newFile.write('\t' + str(song['track']['name']) + "\n")
+    
+            
+        if playlists['next']:
+            playlists = sp.next(playlists)
+        else:
+            #print("total songs",count)
+            playlists = None
+
 
 def removeData():
     
@@ -360,8 +407,8 @@ def countMostConsecutiveListens(data,minimumListenTime = 2):
                 
     fig, ax = plt.subplots()
     
-    for date in listOfShit:
-        plt.scatter(date[0][:10], date[1])
+    for point in listOfShit:
+        plt.scatter(point[0][:10], point[1])
                 
 
     plt.xticks(rotation=60, ha='right')
@@ -397,6 +444,8 @@ def convertStringToDatetimeHelper(stringDate):
 
 # TODO Make use of graphs more, everyone likes graphs
 
+# TODO Link last Spotify Loopup program to this one
+
 def Main():
     data = loadData()
 
@@ -417,8 +466,10 @@ def Main():
     
     
     #removeData()
+    
+    lookAtUsersPublicPlayLists()
 
-    countMostConsecutiveListens(data,1.5)
+    countMostConsecutiveListens(data,0.2)
 
     
     #test1 = convertStringToDatetimeHelper("2019-12-24 15:49")
