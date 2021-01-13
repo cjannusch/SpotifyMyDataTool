@@ -1,4 +1,9 @@
 # SpotifyMyDataTool
+This ReadMe will be formatted as more of a self note thread for myself.  And to explain some design decisions I made if a future employer ever looks at this project.
+
+
+
+
 
 
 # License

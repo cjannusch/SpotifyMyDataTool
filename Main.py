@@ -15,7 +15,7 @@ from dateutil import tz
 from datetime import timedelta
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-from SpotifyApiKeys import getKeys
+from SpotifyApiKeys import CLIENT_ID,CLIENT_SECRET
 
 
 def lookAtUsersPublicPlayLists():
@@ -25,9 +25,6 @@ def lookAtUsersPublicPlayLists():
     
     
     newFile = open('ListOfNames.txt','w+',encoding = 'utf-8')
-    
-    
-    CLIENT_ID,CLIENT_SECRET=getKeys()
     
     auth_manager = SpotifyClientCredentials(CLIENT_ID,CLIENT_SECRET)
     sp = spotipy.Spotify(auth_manager=auth_manager)
@@ -60,7 +57,7 @@ def lookAtUsersPublicPlayLists():
         if playlists['next']:
             playlists = sp.next(playlists)
         else:
-            #print("total songs",count)
+            print("total songs",count)
             playlists = None
 
 
@@ -469,7 +466,7 @@ def Main():
     
     lookAtUsersPublicPlayLists()
 
-    countMostConsecutiveListens(data,0.2)
+    #countMostConsecutiveListens(data,0.2)
 
     
     #test1 = convertStringToDatetimeHelper("2019-12-24 15:49")

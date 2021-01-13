@@ -1,1 +1,3 @@
 my_spotify_data/
+SpotifyApiKeys.py
+__pycache__/
