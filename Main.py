@@ -16,50 +16,132 @@ from datetime import timedelta
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from SpotifyApiKeys import CLIENT_ID,CLIENT_SECRET
+import random
 
 
-def lookAtUsersPublicPlayLists():
+def createSpotifyAPIConnection():
+    auth_manager = SpotifyClientCredentials(CLIENT_ID,CLIENT_SECRET)
+    sp = spotipy.Spotify(auth_manager=auth_manager)
+    
+    return sp
+
+
+
+
+def encode(num):
+    """Encode a positive number into Base X and return the string.
+
+    Arguments:
+    - `num`: The number to encode
+    - `alphabet`: The alphabet to use for encoding
+    """
+    
+    BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    
+    if num == 0:
+        return BASE62[0]
+    arr = []
+    arr_append = arr.append  # Extract bound-method for faster access.
+    _divmod = divmod  # Access to locals is faster.
+    base = len(BASE62)
+    while num:
+        num, rem = _divmod(num, base)
+        arr_append(BASE62[rem])
+    arr.reverse()
+    return ''.join(arr)
+
+def decode(string):
+    """Decode a Base X encoded string into the number
+
+    Arguments:
+    - `string`: The encoded string
+    - `alphabet`: The alphabet to use for decoding
+    """
+    
+    BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    
+    base = len(BASE62)
+    strlen = len(string)
+    num = 0
+
+    idx = 0
+    for char in string:
+        power = (strlen - (idx + 1))
+        num += BASE62.index(char) * (base ** power)
+        idx += 1
+
+    return num
+
+
+
+
+# TODO WORK IN PROGRESS IT NO WORKY
+def findRandomSong(sp, n=10):
+        
+    listOfSongsToSearchFor = []
+    
+    SpotifyID = '6rqhFgbbKwnb9MLmUQDhG6'
+    
+    result = sp.track(SpotifyID)
+    
+    print(result)
+    
+    
+    #for i in range(n):
+        #number = random.randint()
+    
+    #number = 100
+    
+    pass
+
+
+def lookAtUsersPublicPlayLists(sp):
     
     #q=track:TRACKNAME%20artist:ARTISTNAME&type=track
     #q=artist:ARTISTNAME&type=artist
     
     
-    newFile = open('ListOfNames.txt','w+',encoding = 'utf-8')
-    
-    auth_manager = SpotifyClientCredentials(CLIENT_ID,CLIENT_SECRET)
-    sp = spotipy.Spotify(auth_manager=auth_manager)
+    #newFile = open('ListOfNames.txt','w+',encoding = 'utf-8')
     
     SpotifyUserToSearchFor = str(getUser())
     #AlbumID= '0QIzRT7DLG6Eg74WfSUSvW'
+    
+    dictOfAlbums = {}
     
     count = 0
     
     playlists = sp.user_playlists(SpotifyUserToSearchFor)
     while playlists:
         for i, playlist in enumerate(playlists['items']):
-            newFile.write("Playlist = " + str(playlist['name']) + "\n")
-            #print("Playlist =",playlist['name'])
+            #print("Playlist = " + str(playlist['name']) + "\n")
+            #newFile.write("Playlist = " + str(playlist['name']) + "\n")
+            dictOfAlbums[str(playlist['name'])] = []
             
             result = sp.user_playlist_tracks(SpotifyUserToSearchFor,playlist['id'])
-            
-            #print(result)
     
             for song in result['items']:
                 if song == None:
-                    #print("total songs",count)
-                    newFile.write("total songs" + str(count) + "\n")
-                    newFile.close()
+                    pass
+                    #print("total songs" + str(count) + "\n")
+                    #newFile.write("total songs" + str(count) + "\n")
+                    #newFile.close()
                 count +=1
-                #print('\t',song['track']['name'])
-                newFile.write('\t' + str(song['track']['name']) + "\n")
+                #print('\t' + str(song['track']['name']) + "\n")
+                #newFile.write('\t' + str(song['track']['name']) + "\n")
+                stringToAppend = ""
+                stringToAppend = stringToAppend + str(song['track']['name']) 
+                #in case there are multiple listed artists for the track
+                for artist in song['track']['artists']:
+                    stringToAppend = stringToAppend + ' - ' + artist['name']
+                dictOfAlbums[str(playlist['name'])].append(stringToAppend)
     
-            
         if playlists['next']:
             playlists = sp.next(playlists)
         else:
             print("total songs",count)
             playlists = None
 
+    print(dictOfAlbums)
 
 def removeData():
     
@@ -434,10 +516,31 @@ def convertStringToDatetimeHelper(stringDate):
     
     pass
     
+def getAllUserPlaylists():
+    if not path.exists('.\\my_spotify_data\\MyData\\Playlist1.json'):
+        print('file no exist bro')
+        return
+    with open('.\\my_spotify_data\\MyData\\Playlist1.json', encoding="utf8") as g:
+        data = json.load(g)["playlists"]
+    
+
+    dictOfPlaylists = {}
+    count = 0
+    
+    for playlist in data:
+        dictOfPlaylists[playlist['name']] = []
+        for song in playlist['items']:
+            dictOfPlaylists[playlist['name']].append(song['track']['trackName'] \
+                                                     + ' - ' + song['track']['artistName'])
+
+    
+    #print(data)
+    
+    return dictOfPlaylists
+
+
 
 # TODO Write method to find new artists over monthly period
-
-# TODO Write method to find biggest Consecutive listens
 
 # TODO Make use of graphs more, everyone likes graphs
 
@@ -445,6 +548,7 @@ def convertStringToDatetimeHelper(stringDate):
 
 def Main():
     data = loadData()
+    #sp = createSpotifyAPIConnection()
 
     #countPlayTime(data)
     #countArtistListens(data,10)
@@ -456,22 +560,18 @@ def Main():
     
     #runMethodOnYear(data,'2020')
 
-    
     #countArtistListens(data,10,True)
     #countSongListens(data,10,True)
     #countTimeOfDayListening(data)
-    
-    
-    #removeData()
-    
-    lookAtUsersPublicPlayLists()
+
 
     #countMostConsecutiveListens(data,0.2)
 
-    
-    #test1 = convertStringToDatetimeHelper("2019-12-24 15:49")
-    # milliseconds = msPlayed
-    #print(test1)
+    playlists = getAllUserPlaylists()
+
+    #print(playlists.keys())
+    print(playlists['Westridge Pilot'])
+
     
     pass
 

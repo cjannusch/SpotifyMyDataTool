@@ -1,7 +1,8 @@
 # SpotifyMyDataTool
 This ReadMe will be formatted as more of a self note thread for myself.  And to explain some design decisions I made if a future employer ever looks at this project.
 
-
+# PySimpleGUI
+I decided to use PySimgpleGUI to create a GUI because it supports four gui frameworks (tkinter, pyside2, WxPython, Remi).  I'm not entirely sure if I want this to be web app yet, So using PySimpleGUI allows me to just switch the import and not have to rewrite any code if i decide to swtich it at any point.
 
 
 
