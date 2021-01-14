@@ -308,7 +308,9 @@ def countTimeOfDayListening(data):
     plt.xlabel('Hour of The Day')
     plt.ylabel('# of songs listened to')
     plt.style.use('ggplot')
-    plt.show()
+    #plt.show()
+    
+    return plt.gcf()
 
 
 def subsetDataByDate(data,startDate,endDate):
@@ -547,7 +549,7 @@ def getAllUserPlaylists():
 # TODO Link last Spotify Loopup program to this one
 
 def Main():
-    data = loadData()
+    #data = loadData()
     #sp = createSpotifyAPIConnection()
 
     #countPlayTime(data)
@@ -567,10 +569,10 @@ def Main():
 
     #countMostConsecutiveListens(data,0.2)
 
-    playlists = getAllUserPlaylists()
+    #playlists = getAllUserPlaylists()
 
     #print(playlists.keys())
-    print(playlists['Westridge Pilot'])
+    #print(playlists['Westridge Pilot'])
 
     
     pass
