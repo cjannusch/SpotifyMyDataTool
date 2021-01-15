@@ -16,7 +16,7 @@ from datetime import timedelta
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from SpotifyApiKeys import CLIENT_ID,CLIENT_SECRET
-import random
+#import random
 
 
 def createSpotifyAPIConnection():
@@ -78,7 +78,7 @@ def decode(string):
 # TODO WORK IN PROGRESS IT NO WORKY
 def findRandomSong(sp, n=10):
         
-    listOfSongsToSearchFor = []
+#    listOfSongsToSearchFor = []
     
     SpotifyID = '6rqhFgbbKwnb9MLmUQDhG6'
     
@@ -217,7 +217,7 @@ def countPlayTime(data):
     
     return total / (60*60*1000)
     
-def countArtistListens(data,numberOfTopArtists,toGraph = False):
+def countArtistListens(data,numberOfTopArtists,toGraph = False,sg = None):
     
     artistCountDict = {}
     toGraph = {}
@@ -247,14 +247,16 @@ def countArtistListens(data,numberOfTopArtists,toGraph = False):
             'size'   : 10}
         plt.rc('font', **font)
         
-        plt.bar(list(toGraph.keys()), toGraph.values(), color='r', width=0.8)
+        plt.bar(list(toGraph.keys()), toGraph.values(), color='seagreen', width=0.8)
         #plt.legend(loc="upper left")
         plt.title(getUser()+'\'s favorite Artists \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
         plt.ylabel('# of songs listened to')
-        plt.style.use('ggplot')
+        plt.style.use('seaborn-darkgrid')
         plt.xticks(rotation=45, ha='right')
         plt.autoscale()
-        plt.show()
+        #plt.show()
+        
+    return plt.gcf()
 
 def countArtistPlayTime(data,artistName):
     count = 0
@@ -265,16 +267,16 @@ def countArtistPlayTime(data,artistName):
                 count += 1
                 total += item2['msPlayed']
                 
-    minutes = total / (60 * 1000)
+#    minutes = total / (60 * 1000)
     hours = total / (60 * 60 * 1000)
-    days = total / (60 * 60 * 1000 * 24)
+#    days = total / (60 * 60 * 1000 * 24)
     
     #print('Total listen time for',artistName,'is',days,'days over',count,'songs.')
     print('Total listen time for',artistName,'is',hours,'hours over',count,'songs.')
     #print('Total listen time for',artistName,'is',minutes,'mintues over',count,'songs.')
     pass
 
-def countTimeOfDayListening(data):
+def countTimeOfDayListening(data,sg = None):
     
     listOfCounts = {'00':0,'01':0,'02':0,'03':0,'04':0,'05':0,'06':0,'07':0,'08':0,'09':0,'10'
                     :0,'11':0,'12':0,'13':0,'14':0,'15':0,'16':0,'17':0,'18':0,'19':0,'20':0,
@@ -303,11 +305,11 @@ def countTimeOfDayListening(data):
     
     dateStart,dateEnd = getTimePeriodOfData(data)
     
-    plt.bar(list(listOfCounts.keys()), listOfCounts.values(), color='g')
+    plt.bar(list(listOfCounts.keys()), listOfCounts.values(), color='seagreen')
     plt.title(getUser()+'\'s listening habits \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
     plt.xlabel('Hour of The Day')
     plt.ylabel('# of songs listened to')
-    plt.style.use('ggplot')
+    plt.style.use('seaborn-darkgrid')
     #plt.show()
     
     return plt.gcf()
@@ -404,7 +406,7 @@ def runMethodOnYear(data,year):
     countArtistListens(subsetData,3)
     
 
-def countSongListens(data,numberOfTopSongs,toGraph = False):
+def countSongListens(data,numberOfTopSongs,toGraph = False, sg = None):
     
     trackNameCountDict = {}
     toGraph = {}
@@ -434,22 +436,22 @@ def countSongListens(data,numberOfTopSongs,toGraph = False):
             'size'   : 10}
         plt.rc('font', **font)
         
-        plt.bar(list(toGraph.keys()), toGraph.values(), color='r',align='edge', width=.8)
+        plt.bar(list(toGraph.keys()), toGraph.values(), color='seagreen',align='edge', width=.8)
         #plt.legend(loc="upper left")
         plt.title(getUser()+'\'s favorite songs \nfrom ' + str(dateStart) + ' --> ' + str(dateEnd))
         plt.ylabel('# of songs listened to')
-        plt.style.use('ggplot')
+        plt.style.use('seaborn-darkgrid')
         plt.xticks(rotation=45, ha='right')
         plt.autoscale()
-        plt.show()
+        #plt.show()
     
+    return plt.gcf()
         
     
-# TODO redo logic on this method
-def countMostConsecutiveListens(data,minimumListenTime = 2):
+def countMostConsecutiveListens(data,minimumListenTime = 2, sg = None):
     
     isNewListeningSession = True
-    listOfListeningSessions = {}
+#    listOfListeningSessions = {}
     initialItem = None
     initialDate = None
     nextItem = None
@@ -502,7 +504,9 @@ def countMostConsecutiveListens(data,minimumListenTime = 2):
     if len(listOfShit) > 20:
         plt.xticks([])
     
-    plt.show() 
+    #plt.show() 
+    
+    return plt.gcf()
 
 def convertStringToDatetimeHelper(stringDate):
     
@@ -518,7 +522,7 @@ def convertStringToDatetimeHelper(stringDate):
     
     pass
     
-def getAllUserPlaylists():
+def getAllUserPlaylists(sg = None):
     if not path.exists('.\\my_spotify_data\\MyData\\Playlist1.json'):
         print('file no exist bro')
         return
@@ -527,7 +531,7 @@ def getAllUserPlaylists():
     
 
     dictOfPlaylists = {}
-    count = 0
+#    count = 0
     
     for playlist in data:
         dictOfPlaylists[playlist['name']] = []
