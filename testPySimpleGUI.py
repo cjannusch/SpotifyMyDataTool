@@ -66,13 +66,16 @@ def delete_figure_agg(figure_agg):
     figure_agg.get_tk_widget().forget()
     plt.close('all')
 
-figure_w, figure_h = 500,500
+figure_w, figure_h = 700,500
+
+cprint = sg.cprint
 
 dictOfMethods = {'Count Artists Listens': Main.countArtistListens,
                  'Plot When I Listen To Music': Main.countTimeOfDayListening,
                  'Count Song Listens': Main.countSongListens,
                  'Count Most Consecutive Listens': Main.countMostConsecutiveListens,
-                 'Get List Of playlists': Main.getAllUserPlaylists}
+                 'Count Total Listen Time': Main.countPlayTime,
+                 'List User\'s playlists': Main.getAllUserPlaylists}
 
 listbox_values = list(dictOfMethods)
 
@@ -86,89 +89,86 @@ col_listbox = [[sg.In(key='start1', enable_events=True, visible=False), sg.Text(
                [sg.Listbox(values=listbox_values, change_submits=True, size=(28, len(listbox_values)),key='-LISTBOX-')],
                [sg.Text(' ' * 14), sg.Exit(size=(5, 2))]]
 
-col_multiline = sg.Col([[sg.MLine(size=(70, 35), key='-MULTILINE-')]])
+col_multiline = sg.Col([[sg.MLine(size=(130, 15), key='-MULTILINE-')]])
 col_canvas = sg.Col([[sg.Canvas(size=(figure_w, figure_h), key='-CANVAS-')]])
-col_instructions = sg.Col([[sg.Pane([col_canvas, col_multiline], size=(figure_w,figure_h))],
-                           [sg.Text('Grab square above and slide upwards to view text output')]])
+col_instructions = sg.Col([[sg.Pane([col_canvas], size=(figure_w,figure_h))],
+                           [sg.Text('Graphs will only be shown when required')]])
 
-layout = [[sg.Text('Matplotlib Plot Test', font=('ANY 18'))],
-          [sg.Col(col_listbox), col_instructions], ]
+layout = [[sg.Text('Spotify UnWrapped', font=('ANY 18'))],
+          [sg.Col(col_listbox), col_instructions],
+          [col_multiline]]
 
 # create the form and show it without the plot
-window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI',
-                   layout, resizable=True, finalize=True)
+window = sg.Window('Spotify UnWrapped', layout, resizable=True, finalize=True)
 
 canvas_elem = window['-CANVAS-']
-#multiline_elem = window['-MULTILINE-']
+outputBox = window['-MULTILINE-']
 figure_agg = None
+fig = None
 startDate,endDate = Main.getTimePeriodOfData(data)
+startDate,endDate = str(startDate),str(endDate)
 while True:
     event, values = window.read()
-    print(event,values)
+    #print(event,values)
     if event in (sg.WIN_CLOSED, None, 'Exit'):
         plt.close('all')
         break
     if event == 'start1':
-        startDate = window['start1']
-        print(startDate)
+        startDate = values['start1']
+        data = Main.loadData()
     if event == 'end1':
-        endDate = window['end1']
-        print(startDate)
+        endDate = values['end1']
+        data = Main.loadData()
     if event == 'Submit Date Range':
-        print(startDate,endDate)
+        startDate = startDate[0:10]
+        endDate = endDate[0:10]
+        data = Main.subsetDataByDate(data,startDate,endDate)
+        
     if figure_agg:
-        # ** IMPORTANT ** Clean up previous drawing before drawing again
         delete_figure_agg(figure_agg)
-    # get first listbox item chosen (returned as a list)
+
     #OTHER BUTTONS GO ABOVE THIS LINE YO
     #--------------------------------------------------------------------------
     if len(values['-LISTBOX-']) == 0:
         continue
     choice = values['-LISTBOX-'][0]
-    print(choice)
     # get function to call from the dictionary
     func = dictOfMethods[choice]
+    
+    outputBox.update('')
+    
     if func == Main.countArtistListens:
-       fig = Main.countArtistListens(data,10,True)
+       fig = Main.countArtistListens(data,10,True,outputBox)
+       fig.set_dpi(100)
+       fig.set_size_inches(figure_w/100,figure_h/100)
     if func == Main.countTimeOfDayListening:
-       fig = Main.countTimeOfDayListening(data)
+       fig = Main.countTimeOfDayListening(data,outputBox)
+       fig.set_dpi(100)
+       fig.set_size_inches(figure_w/100,figure_h/100)
     if func == Main.countSongListens:
-        fig = Main.countSongListens(data,10,True)
+        fig = Main.countSongListens(data,10,True,outputBox)
+        fig.set_dpi(100)
+        fig.set_size_inches(figure_w/100,figure_h/100)
     if func == Main.countMostConsecutiveListens:
-        fig = Main.countMostConsecutiveListens(data,1)
+        fig = Main.countMostConsecutiveListens(data,1,outputBox)
+        fig.set_dpi(100)
+        fig.set_size_inches(figure_w/100,figure_h/100)
+    if func == Main.countPlayTime:
+        #outputBox.update('')
+        Main.countPlayTime(data,outputBox)
+        if fig == None: 
+            continue
     if func == Main.getAllUserPlaylists:
-        plt.plot([69])
-        fig = plt.gcf()
-    # show source code to function in multiline
-    #window['-MULTILINE-'].update(inspect.getsource(func))
-    #fig = func
-    #time.sleep(1)                                   # call function to get the figure
+        #outputBox.update('')
+        Main.getAllUserPlaylists(outputBox)
+        if fig == None:
+            continue
+    
+    
+    window['-MULTILINE-'].update()                                  # call function to get the figure
     figure_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)  # draw the figure
-    fig = None
     
     
+#print(type(window['-MULTILINE-']))
     
 window.close()
-'''
-
-layout = [  [sg.Text('Chose Method:'),],
-            [sg.Canvas(key='-GRAPH-')],
-            [sg.Button('Ok')],
-            [sg.CalendarButton('Pick Date')]    ]
-
-# create the form and show it without the plot
-window = sg.Window('Demo Application - Embedding Matplotlib In PySimpleGUI', layout, finalize=True, element_justification='center', font='Helvetica 18')
-
-#sg.theme('DarkTeal2')
-
-# add the plot to the window
-fig_canvas_agg = draw_figure(window['-GRAPH-'].TKCanvas, fig)
-
-while True:
-    event, values = window.read()
-    if event in (sg.WIN_CLOSED, 'Ok', None):
-        plt.close('all')
-        break
-
-window.close()
-'''

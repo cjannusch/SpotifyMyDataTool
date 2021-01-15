@@ -204,7 +204,7 @@ def loadData(newMergeFile = False):
     return data
     
     
-def countPlayTime(data):
+def countPlayTime(data, sg = None):
     
     total = 0
     
@@ -212,6 +212,8 @@ def countPlayTime(data):
         for item2 in item:
             total += item2['msPlayed']
     #print('days listened:',total / (60*60*24*1000))
+    if not sg == None:
+        sg.print('hours listened:',total / (60*60*1000))
     print('hours listened:',total / (60*60*1000))
     #print('minutes listened:',total / (60*1000))
     
@@ -233,6 +235,8 @@ def countArtistListens(data,numberOfTopArtists,toGraph = False,sg = None):
             continue
         maximum = max(artistCountDict, key=artistCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(str(i + 1)+':',maximum, '-', artistCountDict[maximum])
+        if not sg == None:
+            sg.print(str(i + 1)+':',maximum, '-', artistCountDict[maximum])
         toGraph[maximum] = artistCountDict[maximum]
         artistCountDict.pop(maximum)
         
@@ -422,6 +426,8 @@ def countSongListens(data,numberOfTopSongs,toGraph = False, sg = None):
             continue
         maximum = max(trackNameCountDict, key=trackNameCountDict.get)  # Just use 'min' instead of 'max' for minimum.
         print(str(i + 1)+':',maximum,'-', trackNameCountDict[maximum])
+        if not sg == None:
+            sg.print(str(i + 1)+':',maximum,'-', trackNameCountDict[maximum])
         toGraph[maximum] = trackNameCountDict[maximum]
         trackNameCountDict.pop(maximum)
         
@@ -539,6 +545,8 @@ def getAllUserPlaylists(sg = None):
             dictOfPlaylists[playlist['name']].append(song['track']['trackName'] \
                                                      + ' - ' + song['track']['artistName'])
 
+    if not sg == None:
+        sg.print(dictOfPlaylists)
     
     #print(data)
     
@@ -562,11 +570,11 @@ def Main():
     
     #countTimeOfDayListening(data)
     
-    #data = subsetDataByDate(data,'2020-03-01','2020-05-01')
+    #data = subsetDataByDate(data,'2020-05-01','2020-09-01')
     
     #runMethodOnYear(data,'2020')
 
-    #countArtistListens(data,10,True)
+    #countArtistListens(data,20,True)
     #countSongListens(data,10,True)
     #countTimeOfDayListening(data)
 
